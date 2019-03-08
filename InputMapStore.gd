@@ -48,7 +48,6 @@ func save(fileName : String) -> Dictionary:
 	var map = {}
 	var actions = InputMap.get_actions()
 	for action in actions:
-		#var x = 
 		if !ignore_list.has(action):
 			var events = InputMap.get_action_list(action)
 			var serialized_events = []
@@ -163,17 +162,3 @@ func inverse_modifier_mask(event, mask):
 		event.command = mask & 4 == 4
 		event.meta = mask &  8 == 8
 		event.shift = mask & 16 == 16
-
-
-
-
-
-
-
-
-
-
-
-
-
-
