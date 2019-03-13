@@ -64,8 +64,8 @@ func save(fileName : String) -> Dictionary:
 	file.close()
 	return map
 
-#import a keymap from a file
-func import(fileName):
+#import a keymap from a file, adding entries to the inputmap, returns the opened json as dictionary
+func import(fileName : String) -> Dictionary:
 	var file = File.new()
 	if !file.file_exists(fileName):
 		return
@@ -81,10 +81,10 @@ func import(fileName):
 			for s_event in s_events:
 				var event = deserialize_event(s_event)
 				InputMap.action_add_event(action, event)
-					
+	return map
 
 #serialize an event
-func serialize_event(event):
+func serialize_event(event : InputEvent) -> Dictionary:
 	match event.get_class():
 		"InputEventAction":
 			return {
@@ -115,20 +115,20 @@ func serialize_event(event):
 			}
 
 #deserialize an event
-func deserialize_event(map):
+func deserialize_event(map : Dictionary) -> InputEvent:
 	match map["type"]:
 		"key":
 			var event = InputEventKey.new()
 			event.device = int(map["device"])
 			event.scancode = int(map["index"])
-			inverse_modifier_mask(event, map["modifiers"])
+			inverse_modifier_mask(event, int(map["modifiers"]))
 			return event
 		"mouse":
 			var event = InputEventMouseButton.new()
 			event.device = int(map["device"])
 			event.button_index = int(map["index"])
 			event.button_mask = int(map["button_mask"])
-			inverse_modifier_mask(event, map["modifiers"])
+			inverse_modifier_mask(event, int(map["modifiers"]))
 			return event
 		"joypadbutton":
 			var event = InputEventJoypadButton.new()
@@ -142,7 +142,7 @@ func deserialize_event(map):
 			return event
 
 #create a bitmask to store modifier keys
-func modifier_mask(event):
+func modifier_mask(event : InputEventWithModifiers) -> int:
 	var r = 0
 	if event is InputEventWithModifiers:
 		if event.alt: r += 1
@@ -154,8 +154,8 @@ func modifier_mask(event):
 	return r
 
 #revert bitmask for modifier keys
-func inverse_modifier_mask(event, mask):
-	mask = int(mask)
+#event is a reference argument
+func inverse_modifier_mask(event : InputEventWithModifiers, mask : int) -> void:
 	if event is InputEventWithModifiers:
 		event.alt = mask & 1 == 1
 		event.control = mask & 2 == 2
